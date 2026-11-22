@@ -187,11 +187,18 @@ def run_check(settings, agent, offline: bool, out=print) -> int:
     return 0 if ok else 2
 
 
+def _safe_out(out, msg: str) -> None:
+    try:
+        if out is not None:
+            out(msg)
+    except Exception:
+        pass
+
+
 def run_daemon(settings=None, stop_event=None, out=print) -> int:
     """Headless always-on background mode: connectors, scheduler, web access, and 60s resource sampling."""
     import signal
     import threading
-    import time
     from .ui.controller import Controller
 
     controller = Controller(settings)
@@ -208,11 +215,15 @@ def run_daemon(settings=None, stop_event=None, out=print) -> int:
     controller.start_scheduler()
     controller.start_web_if_enabled()
     controller.activity.record(summary="Pilot started in background mode.", kind="system", source="system")
-    out(f"{APP_NAME} background service is running. Press Ctrl+C to stop.")
+    _safe_out(out, f"{APP_NAME} background service is running. Press Ctrl+C to stop.")
     try:
         while not stop.is_set():
             try:
                 controller.sample_resources()
+                cfg = controller.web_config()
+                if (cfg.get("running") and cfg.get("auto_tunnel") and cfg.get("has_tunnel_token")
+                        and not cfg.get("tunnel_running") and not controller.is_paused()):
+                    controller.start_public_tunnel()
             except Exception:
                 pass
             stop.wait(60.0)
@@ -241,7 +252,7 @@ def run_web(settings=None, host: str = "", port: int | None = None,
     env_pw = os.environ.get("PILOT_WEB_PASSWORD", "").strip()
     err = controller.configure_web(enabled=True, host=bind_host, port=int(raw_port), new_password=env_pw)
     if err:
-        out(f"Could not start web access: {err}")
+        _safe_out(out, f"Could not start web access: {err}")
         return 1
 
     stop = stop_event or threading.Event()
@@ -256,15 +267,15 @@ def run_web(settings=None, host: str = "", port: int | None = None,
 
     controller.start_connectors()
     controller.start_scheduler()
-    out(f"{APP_NAME} web app running at: " + " | ".join(controller.web_config()["urls"]))
+    _safe_out(out, f"{APP_NAME} web app running at: " + " | ".join(controller.web_config()["urls"]))
     if tunnel:
-        out("Starting free Cloudflare HTTPS tunnel...")
+        _safe_out(out, "Starting free Cloudflare HTTPS tunnel...")
         pub_url, t_err = controller.start_public_tunnel()
         if t_err:
-            out(f"Public tunnel failed: {t_err}")
+            _safe_out(out, f"Public tunnel failed: {t_err}")
         else:
-            out(f"Public HTTPS link (password-protected): {pub_url}")
-    out("Press Ctrl+C to stop.")
+            _safe_out(out, f"Public HTTPS link (password-protected): {pub_url}")
+    _safe_out(out, "Press Ctrl+C to stop.")
     try:
         while not stop.is_set():
             try:
