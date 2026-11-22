@@ -81,9 +81,9 @@ class CloudflareTunnelTests(unittest.TestCase):
             port = free_port()
             self.assertEqual(ctrl.configure_web(True, "127.0.0.1", port, "secretpass"), "")
 
-            def fake_factory(p):
+            def fake_factory(p, tok="", custom=""):
                 return CloudflareTunnel(
-                    p, exe_path="fake.exe",
+                    p, exe_path="fake.exe", tunnel_token=tok, custom_url=custom,
                     process_factory=lambda argv: FakeProc(["https://demo-abc.trycloudflare.com"]),
                 )
 
@@ -96,6 +96,19 @@ class CloudflareTunnelTests(unittest.TestCase):
             ctrl.pause_all()
             self.assertFalse(ctrl.web_config()["tunnel_running"])
             self.assertEqual(ctrl.web_config()["public_url"], "")
+            ctrl.resume_all()
+
+            # Configure permanent custom domain + secret named tunnel token (redacted everywhere)
+            fake_tok = "fake-tunnel-" + "x" * 24
+            self.assertEqual(ctrl.configure_tunnel("app.example.com", fake_tok, auto_tunnel=True), "")
+            self.assertIn("[hidden]", ctrl.settings.redact(f"tok={fake_tok}"))
+            cfg = ctrl.web_config()
+            self.assertEqual(cfg["custom_url"], "https://app.example.com")
+            self.assertTrue(cfg["has_tunnel_token"])
+            self.assertTrue(cfg["auto_tunnel"])
+            url3, err3 = ctrl.start_public_tunnel(tunnel_factory=fake_factory)
+            self.assertEqual(err3, "")
+            self.assertEqual(url3, "https://app.example.com")
 
 
 class OnlineWorkspaceAndProxyTests(unittest.TestCase):

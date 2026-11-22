@@ -764,6 +764,7 @@ class Controller:
     # --- password-protected web access & free Cloudflare HTTPS tunnel ---------------------------
     def web_config(self) -> dict:
         cfg = self.settings.get("web_access", default={}) or {}
+        cf_sec = self.settings.get("connector_secrets", "cloudflare", default={}) or {}
         running = bool(self.web_server and self.web_server.running)
         tunnel_running = bool(self.tunnel and self.tunnel.running)
         return {
@@ -776,7 +777,39 @@ class Controller:
             "tunnel_available": bool(find_cloudflared()),
             "tunnel_running": tunnel_running,
             "public_url": self.tunnel.public_url if tunnel_running else "",
+            "custom_url": str(cfg.get("custom_url") or ""),
+            "has_tunnel_token": bool(cf_sec.get("tunnel_token")),
+            "auto_tunnel": bool(cfg.get("auto_tunnel", False)),
         }
+
+    def configure_tunnel(self, custom_url: str = "", tunnel_token: str = "",
+                         auto_tunnel: bool | None = None, clear_token: bool = False) -> str:
+        """Save an optional permanent Cloudflare Named Tunnel token + custom domain URL."""
+        cfg = dict(self.settings.get("web_access", default={}) or {})
+        cf_sec = dict(self.settings.get("connector_secrets", "cloudflare", default={}) or {})
+        url = (custom_url or "").strip()
+        if url:
+            if not url.lower().startswith(("http://", "https://")):
+                url = "https://" + url
+            if " " in url or "." not in url:
+                return "Enter a valid web address like https://app.yourdomain.com."
+            cfg["custom_url"] = url.rstrip("/")
+        elif clear_token:
+            cfg.pop("custom_url", None)
+        tok = clean_key(tunnel_token)
+        if clear_token:
+            cf_sec.pop("tunnel_token", None)
+            cfg["auto_tunnel"] = False
+        elif tok:
+            if len(tok) < 20:
+                return "That Cloudflare Tunnel token looks too short. Paste the full token from Cloudflare Zero Trust."
+            cf_sec["tunnel_token"] = tok
+        if auto_tunnel is not None and not clear_token:
+            cfg["auto_tunnel"] = bool(auto_tunnel)
+        self.settings.set("web_access", cfg)
+        self.settings.set("connector_secrets", "cloudflare", cf_sec)
+        self._save_file()
+        return ""
 
     def start_public_tunnel(self, tunnel_factory=None) -> tuple[str, str]:
         """Put Pilot's password-protected Web page online over HTTPS via free Cloudflare Tunnel ($0)."""
@@ -790,7 +823,7 @@ class Controller:
         token = str((self.settings.get("connector_secrets", "cloudflare", default={}) or {}).get("tunnel_token") or "")
         custom_url = str((self.settings.get("web_access", default={}) or {}).get("custom_url") or "")
         tunnel = (
-            tunnel_factory(port)
+            tunnel_factory(port, token, custom_url)
             if tunnel_factory is not None
             else CloudflareTunnel(port, tunnel_token=token, custom_url=custom_url)
         )
@@ -853,6 +886,8 @@ class Controller:
                 self.web_server.start()
             except OSError:
                 self.web_server = None
+        if self.web_server and self.web_server.running and cfg.get("auto_tunnel") and cfg.get("has_tunnel_token") and not self.is_paused():
+            threading.Thread(target=self.start_public_tunnel, daemon=True, name="pilot-auto-tunnel").start()
 
     def stop_web(self) -> None:
         self.stop_public_tunnel()

@@ -461,6 +461,7 @@ Requested by the owner (Option 2 — \$0/mo online now, cloud-ready later, plus 
 - Installed `Cloudflare.cloudflared` (v2026.11.1) via `winget` cleanly in user scope (`find_cloudflared()` detected it automatically; verified real Cloudflare Edge assigned a live `https://*.trycloudflare.com` URL cleanly and shut down cleanly).
 - Note: `Git.Git` installer requires a Windows UAC administrator prompt, so the owner will run `winget install Git.Git` (or install GitHub Desktop) when ready to push the repo to GitHub.
 - **Full unit test suite + 24-step UI walkthrough:** `python -m unittest discover -s tests -t .` -> **178 tests OK** (up from 172); offline baseline stays **398 tokens**.
+- **Permanent custom domain support (`ikjotai.ca`):** Added `Controller.configure_tunnel()` + **Permanent custom domain (Cloudflare Tunnel)** UI in Settings (`src/ui/settings_view.py`: Domain URL, masked Tunnel token stored redacted in `connector_secrets.cloudflare.tunnel_token`, `Auto-connect on startup` toggle), added `docs/CNAME` (`ikjotai.ca`) for GitHub Pages, and made `docs/index.html` default to `https://app.<current-domain>` automatically.
 
 ---
 

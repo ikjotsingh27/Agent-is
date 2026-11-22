@@ -333,7 +333,8 @@ class SettingsView:
             if cfg["tunnel_running"]:
                 t.button(act, "Stop public link", self._stop_tunnel, kind="secondary").pack(side="left", padx=(8, 0))
             else:
-                self.tunnel_btn = t.button(act, "Put online (free HTTPS link)", self._start_tunnel, kind="secondary")
+                lbl = "Connect custom domain" if cfg.get("has_tunnel_token") else "Put online (free HTTPS link)"
+                self.tunnel_btn = t.button(act, lbl, self._start_tunnel, kind="secondary")
                 self.tunnel_btn.pack(side="left", padx=(8, 0))
 
         if cfg["tunnel_running"] and cfg["public_url"]:
@@ -341,16 +342,76 @@ class SettingsView:
             pub.pack(fill="x", pady=(8, 0))
             t.label(pub, f"Public HTTPS link: {cfg['public_url']}", bg="card", fg="ok",
                     font=FONT_SMALL, wraplength=440).pack(side="left")
-            t.button(pub, "Open public link", lambda u=cfg["public_url"]: webbrowser.open(u),
-                     kind="secondary").pack(side="right", padx=(6, 0))
-            t.button(pub, "Copy link", lambda u=cfg["public_url"]: self._copy_text(u),
-                     kind="secondary").pack(side="right")
+            if cfg["public_url"].startswith("http"):
+                t.button(pub, "Open public link", lambda u=cfg["public_url"]: webbrowser.open(u),
+                         kind="secondary").pack(side="right", padx=(6, 0))
+                t.button(pub, "Copy link", lambda u=cfg["public_url"]: self._copy_text(u),
+                         kind="secondary").pack(side="right")
+
+        # Permanent custom domain (Cloudflare Named Tunnel)
+        t.label(card, "Permanent custom domain (Cloudflare Tunnel — optional)", bg="card",
+                font=FONT_BOLD).pack(fill="x", pady=(12, 4))
+        dom_row = t.frame(card, bg="card")
+        dom_row.pack(fill="x", pady=2)
+        t.label(dom_row, "Domain URL", bg="card", font=FONT_SMALL).pack(side="left", padx=(0, 8))
+        self.cf_url = t.entry(dom_row, width=28)
+        if cfg.get("custom_url"):
+            self.cf_url.insert(0, cfg["custom_url"])
+        self.cf_url.pack(side="left", ipady=3, padx=(0, 8))
+        t.label(dom_row, "e.g. https://app.yourdomain.com", bg="card", fg="muted", font=FONT_SMALL).pack(side="left")
+
+        tok_row = t.frame(card, bg="card")
+        tok_row.pack(fill="x", pady=4)
+        t.label(tok_row, "Tunnel token", bg="card", font=FONT_SMALL).pack(side="left", padx=(0, 6))
+        self.cf_token = t.entry(tok_row, show="•", width=28)
+        self.cf_token.pack(side="left", ipady=3)
+        t.button(tok_row, "Paste", lambda: paste_into(self.frame, self.cf_token),
+                 kind="secondary").pack(side="left", padx=(6, 0))
+        tok_hint = "Saved (leave blank to keep)" if cfg.get("has_tunnel_token") else "From Cloudflare Zero Trust"
+        t.label(tok_row, tok_hint, bg="card", fg="muted", font=FONT_SMALL).pack(side="left", padx=(8, 0))
+
+        dom_act = t.frame(card, bg="card")
+        dom_act.pack(fill="x", pady=(4, 0))
+        t.button(dom_act, "Save domain", self._save_domain, kind="secondary").pack(side="left")
+        auto_on = bool(cfg.get("auto_tunnel"))
+        t.button(dom_act, f"Auto-connect on startup: {'On' if auto_on else 'Off'}",
+                 lambda on=not auto_on: self._toggle_auto_tunnel(on),
+                 kind="primary" if auto_on else "secondary").pack(side="left", padx=(8, 0))
+        if cfg.get("has_tunnel_token") or cfg.get("custom_url"):
+            t.button(dom_act, "Clear domain", self._clear_domain, kind="secondary").pack(side="left", padx=(8, 0))
 
         self.web_msg = t.label(card, "", bg="card", fg="muted", font=FONT_SMALL, wraplength=600)
         self.web_msg.pack(fill="x", pady=(6, 0))
-        t.label(card, "Tip: Click 'Put online (free HTTPS link)' to open Pilot from anywhere on the internet for $0 "
-                      "via Cloudflare Tunnel (protected by your password). Your password is stored only as a salted hash.",
+        t.label(card, "Tip: Click 'Put online' for a free instant HTTPS link, or save a Cloudflare Named Tunnel token "
+                      "above to connect Pilot permanently to your own domain.",
                 bg="card", fg="muted", font=FONT_SMALL, wraplength=600).pack(fill="x", pady=(4, 0))
+
+    def _save_domain(self) -> None:
+        err = self.app.controller.configure_tunnel(
+            custom_url=self.cf_url.get().strip(),
+            tunnel_token=self.cf_token.get(),
+        )
+        if err:
+            self.web_msg.configure(text=err, fg=self.app.theme["bad"])
+            return
+        self._draw_web_access()
+        self.web_msg.configure(text="Custom domain saved. Click 'Connect custom domain' to go live.",
+                               fg=self.app.theme["ok"])
+
+    def _toggle_auto_tunnel(self, enabled: bool) -> None:
+        self.app.controller.configure_tunnel(
+            custom_url=self.cf_url.get().strip(),
+            tunnel_token=self.cf_token.get(),
+            auto_tunnel=enabled,
+        )
+        self._draw_web_access()
+
+    def _clear_domain(self) -> None:
+        self.app.controller.stop_public_tunnel()
+        self.app.controller.configure_tunnel(clear_token=True)
+        self._draw_web_access()
+        self.app._update_web_badge()
+        self.web_msg.configure(text="Custom domain cleared.", fg=self.app.theme["muted"])
 
     def _copy_text(self, text: str) -> None:
         self.frame.clipboard_clear()

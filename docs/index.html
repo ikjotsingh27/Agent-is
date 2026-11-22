@@ -206,7 +206,10 @@ footer {
 </div>
 <script>
 const input = document.getElementById("pilot-url");
-const saved = localStorage.getItem("pilot_live_url") || "";
+const host = window.location.hostname || "";
+const isCustom = host && !host.endsWith("github.io") && host !== "localhost" && host !== "127.0.0.1";
+const defaultAppUrl = isCustom ? ("https://app." + host.replace(/^www\./, "")) : "";
+const saved = localStorage.getItem("pilot_live_url") || defaultAppUrl;
 if (saved) input.value = saved;
 document.getElementById("open-btn").addEventListener("click", () => {
   let u = input.value.trim();
