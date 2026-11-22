@@ -1,0 +1,20 @@
+# Secrets and local data. Never commit these.
+data/settings.json
+data/usage/*
+!data/usage/.gitkeep
+data/memory/*
+!data/memory/.gitkeep
+data/chats/
+data/tool_output/
+data/agent/
+data/crash.log
+data/settings.json.tmp
+
+# Read-only reference clone of Hermes Agent (re-create it with the command in reference/README.md)
+reference/hermes/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/

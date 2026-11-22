@@ -1,0 +1,46 @@
+{
+  "provider": "gemini",
+  "api_keys": { "gemini": "", "anthropic": "" },
+  "models": { "main": "gemini-flash-lite-latest", "cheap": "gemini-flash-lite-latest" },
+  "reasoning_effort": "low",
+  "limits": {
+    "daily_tokens": 300000,
+    "daily_usd": 2.0,
+    "max_calls_per_task": 8,
+    "max_output_tokens": 1024,
+    "max_output_tokens_with_tools": 4096,
+    "max_tool_output_chars": 4000,
+    "long_run_seconds": 45
+  },
+  "workspace": {
+    "max_disk_gb": 5,
+    "max_ram_gb": 2,
+    "command_seconds": 120
+  },
+  "context": { "recent_turns": 6, "max_summary_chars": 1200 },
+  "prompt_caching": true,
+  "ui": { "theme": "dark" },
+  "agent_tools": { "files": true, "memory": true, "terminal": true, "browser": true },
+  "permissions": {
+    "delete": "ask",
+    "install": "ask",
+    "network": "ask",
+    "outside": "ask",
+    "launch": "ask",
+    "system": "ask",
+    "other": "ask"
+  },
+  "always_allow": [],
+  "schedule_policy": { "when_ignored": "keep_going" },
+  "runtime": { "paused": false, "start_with_windows": false },
+  "web_access": { "enabled": false, "host": "127.0.0.1", "port": 8765 },
+  "connectors": {},
+  "connector_secrets": {},
+  "enabled_tools": [],
+  "prices_per_million_tokens": {
+    "gemini-flash-lite-latest": { "input": 0.0, "output": 0.0, "cache_read": 0.0, "cache_write": 0.0 },
+    "claude-sonnet-5-5": { "input": 2.0, "output": 10.0, "cache_read": 0.10, "cache_write": 2.5 },
+    "claude-haiku-5-5": { "input": 0.10, "output": 0.50, "cache_read": 0.01, "cache_write": null }
+  },
+  "prices_note": "USD per million tokens. Gemini free-tier models default to 0. Claude prices are from public price lists in October 2026."
+}

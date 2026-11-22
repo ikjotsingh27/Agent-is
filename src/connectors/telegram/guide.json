@@ -1,0 +1,35 @@
+{
+  "id": "telegram",
+  "name": "Telegram",
+  "summary": "Chat with Pilot from your phone.",
+  "steps": [
+    {
+      "title": "Open BotFather",
+      "text": "Open Telegram on your phone or computer and search for BotFather. Pick the one with the blue check mark, then tap Start.",
+      "link": "https://t.me/BotFather",
+      "link_label": "Open BotFather"
+    },
+    {
+      "title": "Make your bot",
+      "text": "Send /newbot to BotFather. It asks for a name (anything, like My Pilot) and then a username that must end in bot (like mypilot123_bot)."
+    },
+    {
+      "title": "Copy the token",
+      "text": "BotFather replies with a token that looks like 123456789:ABCdef... Copy all of it. Keep it private, like a password."
+    },
+    {
+      "title": "Paste it here",
+      "text": "Click Paste below to put the token in the box."
+    },
+    {
+      "title": "Say hi to your bot",
+      "text": "In Telegram, open the link BotFather gave you (t.me/ and your bot's username), tap Start and send any message. Then press Test connection here."
+    }
+  ],
+  "fields": [
+    {"key": "bot_token", "label": "Bot token", "secret": true}
+  ],
+  "test_button": "Test connection",
+  "privacy": "Messages to your bot travel through Telegram's servers. Pilot answers only you: the person who messages the bot during setup. Pilot can answer while it is open on your computer.",
+  "connected_text": "Message your bot on Telegram and Pilot will answer."
+}

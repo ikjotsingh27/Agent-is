@@ -1,0 +1,40 @@
+{
+  "id": "discord",
+  "name": "Discord",
+  "summary": "Chat with Pilot in Discord DMs and share files.",
+  "steps": [
+    {
+      "title": "Create a Discord app",
+      "text": "Open the Discord Developer Portal, sign in, click New Application, give it a name (like My Pilot), and click Create.",
+      "link": "https://discord.com/developers/applications",
+      "link_label": "Open Developer Portal"
+    },
+    {
+      "title": "Turn on Message Content Intent",
+      "text": "Click Bot in the left menu. Scroll to Privileged Gateway Intents, switch Message Content Intent ON, and click Save Changes."
+    },
+    {
+      "title": "Copy the bot token",
+      "text": "Near the top of the Bot page, click Reset Token, confirm, and copy the token. Keep it private, like a password."
+    },
+    {
+      "title": "Add the bot to a private server",
+      "text": "Click OAuth2 in the left menu, tick bot under Scopes, copy the URL at the bottom, open it in your browser, and add the bot to a private server you own (Discord needs one shared server so the bot can DM you)."
+    },
+    {
+      "title": "Copy your Discord User ID",
+      "text": "In Discord, open User Settings -> Advanced and switch Developer Mode ON. Then right-click your own name and click Copy User ID (a long number)."
+    },
+    {
+      "title": "Paste both below and test",
+      "text": "Paste your bot token and your User ID below, then click Test connection. Pilot will send you a hello DM on Discord."
+    }
+  ],
+  "fields": [
+    {"key": "bot_token", "label": "Bot token", "secret": true},
+    {"key": "owner_user_id", "label": "Your Discord User ID", "secret": false}
+  ],
+  "test_button": "Test connection",
+  "privacy": "Messages and files sent through Discord travel through Discord's servers. Pilot answers only your User ID in direct messages and ignores server channels and other people. Pilot can answer while it is open on your computer.",
+  "connected_text": "Reply to your bot's DM on Discord and Pilot will answer."
+}

@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pilot — Personal Always-On AI Agent</title>
+<style>
+:root {
+  --bg: #0f1117;
+  --surface: #171a22;
+  --card: #1d212c;
+  --border: #2a3040;
+  --text: #edf0f7;
+  --muted: #98a2b3;
+  --accent: #7d9bff;
+  --accent-2: #3ecf8e;
+  --warn: #f2b544;
+  --danger: #f06464;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  background: radial-gradient(circle at top center, #1b2236 0%, var(--bg) 52%);
+  color: var(--text);
+  line-height: 1.6;
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.wrap { max-width: 1040px; margin: 0 auto; padding: 28px 22px 72px; }
+nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-bottom: 36px; border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.brand { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent-2); box-shadow: 0 0 12px var(--accent-2); }
+.nav-links { display: flex; gap: 20px; font-size: 14px; color: var(--muted); }
+.nav-links a { color: var(--muted); }
+.nav-links a:hover { color: var(--text); text-decoration: none; }
+
+.hero { padding: 56px 0 36px; text-align: center; }
+.pill {
+  display: inline-block; padding: 5px 12px; border-radius: 999px; font-size: 12px; font-weight: 600;
+  background: rgba(125,155,255,0.14); color: var(--accent); border: 1px solid rgba(125,155,255,0.3);
+  margin-bottom: 16px;
+}
+h1 { font-size: clamp(32px, 5vw, 52px); line-height: 1.12; margin: 0 0 16px; letter-spacing: -0.02em; }
+.lead { max-width: 660px; margin: 0 auto 28px; color: var(--muted); font-size: 17px; }
+
+.launcher {
+  max-width: 620px; margin: 0 auto; background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 18px; text-align: left;
+  box-shadow: 0 14px 40px rgba(0,0,0,0.35);
+}
+.launcher label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+.launch-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.launch-row input {
+  flex: 1; min-width: 220px; background: var(--surface); border: 1px solid var(--border);
+  color: var(--text); border-radius: 9px; padding: 11px 13px; font-size: 14px; outline: none;
+}
+.launch-row input:focus { border-color: var(--accent); }
+.btn {
+  background: var(--accent); color: #0e1118; border: none; border-radius: 9px;
+  padding: 11px 18px; font-weight: 700; font-size: 14px; cursor: pointer;
+}
+.btn:hover { filter: brightness(1.08); }
+.hint { font-size: 12px; color: var(--muted); margin-top: 8px; }
+.hint code { background: var(--surface); padding: 2px 6px; border-radius: 5px; color: var(--text); }
+
+.section-title { font-size: 24px; margin: 54px 0 16px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px;
+}
+.card h3 { margin: 0 0 8px; font-size: 16px; }
+.card p { margin: 0; color: var(--muted); font-size: 14px; }
+.tag {
+  display: inline-block; font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.05em; margin-bottom: 8px; color: var(--accent-2);
+}
+.tag.warn { color: var(--warn); }
+.tag.danger { color: var(--danger); }
+
+.steps { counter-reset: s; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+.step {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px;
+}
+.step::before {
+  counter-increment: s; content: "0" counter(s); display: inline-block; font-size: 12px; font-weight: 700;
+  color: var(--accent); margin-bottom: 6px;
+}
+.step h4 { margin: 0 0 6px; font-size: 15px; }
+.step p { margin: 0; font-size: 13px; color: var(--muted); }
+footer {
+  margin-top: 64px; padding-top: 22px; border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  font-size: 13px; color: var(--muted);
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand"><span class="dot"></span> Pilot</div>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#safety">Safety</a>
+      <a href="#setup">Go Online</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="pill">100% Python Standard Library · Local-First · Free to Run</div>
+    <h1>Your own always-on AI agent, with its own workspace and terminal.</h1>
+    <p class="lead">
+      Pilot runs privately on your computer (or in your own cloud container later), thinks through your API key,
+      shows every step live, asks before risky actions, and connects to Telegram, Gmail, Google Calendar, and Discord.
+    </p>
+
+    <div class="launcher">
+      <label for="pilot-url">Open your live Pilot workspace (password-protected)</label>
+      <div class="launch-row">
+        <input id="pilot-url" type="url" placeholder="https://your-link.trycloudflare.com  or  http://127.0.0.1:8765">
+        <button class="btn" id="open-btn" type="button">Open Pilot</button>
+      </div>
+      <div class="hint">
+        Saved only in this browser. Start Pilot on your PC with <code>python -m src window</code> (or <code>python -m src web --tunnel</code>) and click <b>Put online (free HTTPS link)</b> in Settings.
+      </div>
+    </div>
+  </section>
+
+  <h2 id="features" class="section-title">Everything inside Pilot</h2>
+  <div class="grid">
+    <div class="card">
+      <div class="tag">Isolated Environment</div>
+      <h3>Own Workspace, Python &amp; Terminal</h3>
+      <p>5 GB workspace folder, 2 GB RAM cap and 2-minute timeout per command, optional isolated Python venv, headless browser, and a live Web Terminal &amp; file manager.</p>
+    </div>
+    <div class="card">
+      <div class="tag">Chat, Files &amp; Voice</div>
+      <h3>Two-Way Files, PDFs &amp; Voice Notes</h3>
+      <p>Send any file or record a voice note with one click. Pilot natively reads PDF, Word, Excel, and PowerPoint, creates clean PDFs, and shows live step-by-step thinking.</p>
+    </div>
+    <div class="card">
+      <div class="tag">Guided Connectors</div>
+      <h3>Telegram, Gmail, Calendar &amp; Discord</h3>
+      <p>Built-in step-by-step setup and live Green / Yellow / Red health checks. Each connector stays narrowly scoped and loads tools only when switched on.</p>
+    </div>
+    <div class="card">
+      <div class="tag warn">Safety &amp; Approvals</div>
+      <h3>Approve Cards &amp; Second Check</h3>
+      <p>Risky commands and outgoing emails wait for Approve or Deny with a separate second-check warning for deletes, personal folders, or brand-new email addresses.</p>
+    </div>
+    <div class="card">
+      <div class="tag">Low Token Cost</div>
+      <h3>388-Token Baseline &amp; Quiet Runs</h3>
+      <p>Lazy tool loading, cheap-model routing for easy chats, 6-turn rolling context, lazy skills, daily token &amp; dollar caps, and quiet scheduled checks.</p>
+    </div>
+    <div class="card">
+      <div class="tag danger">Full Control</div>
+      <h3>Memory, Activity &amp; Pause All</h3>
+      <p>Plain editable Markdown memory notes, searchable Activity log with daily summaries, live RAM/CPU/GPU/disk dashboard, and one big red Pause All button.</p>
+    </div>
+  </div>
+
+  <h2 id="safety" class="section-title">Privacy &amp; trust by design</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Keys stay on your machine</h3>
+      <p>API keys and connector secrets live only in local <code>data/settings.json</code> (git-ignored) and are redacted from chat, logs, and error messages.</p>
+    </div>
+    <div class="card">
+      <h3>Never-allowed guardrails</h3>
+      <p>Reading saved browser/Windows passwords, reading Pilot's keys, disabling Windows security, and moving money or trading are always blocked.</p>
+    </div>
+    <div class="card">
+      <h3>Password-protected web access</h3>
+      <p>Salted PBKDF2-SHA256 password hashing (200k rounds), brute-force lockout, HttpOnly SameSite=Strict Secure cookies, and CSRF header checks.</p>
+    </div>
+  </div>
+
+  <h2 id="setup" class="section-title">How to run online for $0 (and upgrade to a domain later)</h2>
+  <div class="steps">
+    <div class="step">
+      <h4>Start Pilot on your PC</h4>
+      <p>Open Pilot (<code>python -m src window</code>) and turn on <b>Web access</b> in Settings with a strong password.</p>
+    </div>
+    <div class="step">
+      <h4>Click "Put online"</h4>
+      <p>Press <b>Put online (free HTTPS link)</b> to launch a free Cloudflare HTTPS Tunnel — no router ports or monthly server bill.</p>
+    </div>
+    <div class="step">
+      <h4>Access from anywhere</h4>
+      <p>Paste your HTTPS link into the box at the top of this GitHub Pages site from your phone, laptop, or tablet.</p>
+    </div>
+    <div class="step">
+      <h4>Add a domain &amp; cloud later</h4>
+      <p>When you're ready, connect your custom domain to a named Cloudflare Tunnel or deploy the included <code>Dockerfile</code> to Railway / Render.</p>
+    </div>
+  </div>
+
+  <footer>
+    <span>Pilot · Personal Always-On Agent</span>
+    <span>Local-first · Standard library only · Ready for your custom domain</span>
+  </footer>
+</div>
+<script>
+const input = document.getElementById("pilot-url");
+const saved = localStorage.getItem("pilot_live_url") || "";
+if (saved) input.value = saved;
+document.getElementById("open-btn").addEventListener("click", () => {
+  let u = input.value.trim();
+  if (!u) { input.focus(); return; }
+  if (!/^https?:\/\//i.test(u)) u = "https://" + u;
+  localStorage.setItem("pilot_live_url", u);
+  window.open(u, "_blank", "noopener");
+});
+</script>
+</body>
+</html>

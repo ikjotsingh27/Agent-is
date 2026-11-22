@@ -1,0 +1,58 @@
+{
+  "id": "gmail",
+  "name": "Gmail",
+  "summary": "Read mail from one mailbox and send replies only with your OK.",
+  "steps": [
+    {
+      "title": "Make sure 2-Step Verification is on",
+      "text": "Google only lets you create an App Password when 2-Step Verification is turned on for your Google Account.",
+      "link": "https://myaccount.google.com/security",
+      "link_label": "Open Google Security"
+    },
+    {
+      "title": "Create a 16-letter App Password",
+      "text": "Open Google's App Passwords page, type \"Pilot\" as the app name, and press Create. Google shows a 16-letter password.",
+      "link": "https://myaccount.google.com/apppasswords",
+      "link_label": "Open App Passwords"
+    },
+    {
+      "title": "Pick your mailbox and access level",
+      "text": "Keep INBOX to read your inbox, or type a single Gmail label (like School) so Pilot only sees that folder. Choose Read only unless you also want Pilot to send emails after asking your OK."
+    },
+    {
+      "title": "Paste and test",
+      "text": "Paste your Gmail address and the 16-letter App Password below, then press Test connection. Pilot will connect in read-only mode to verify."
+    }
+  ],
+  "fields": [
+    {
+      "key": "email",
+      "label": "Gmail address",
+      "secret": false
+    },
+    {
+      "key": "app_password",
+      "label": "App Password",
+      "secret": true
+    },
+    {
+      "key": "mailbox",
+      "label": "Mailbox or label",
+      "secret": false,
+      "default": "INBOX"
+    },
+    {
+      "key": "access",
+      "label": "Permission",
+      "secret": false,
+      "default": "read_only",
+      "choices": [
+        {"value": "read_only", "label": "Read only (recommended)"},
+        {"value": "read_and_send", "label": "Read & send (asks your OK)"}
+      ]
+    }
+  ],
+  "test_button": "Test connection",
+  "connected_text": "Ask Pilot to check your email in Chat whenever you like.",
+  "privacy": "Your App Password stays only on this computer in data/settings.json. Pilot only opens the one mailbox or label you named, never deletes emails, never touches Google Drive, and always asks for Approve or Deny before sending any email."
+}

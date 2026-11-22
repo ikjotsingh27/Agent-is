@@ -1,0 +1,37 @@
+{
+  "id": "calendar",
+  "name": "Google Calendar",
+  "summary": "Check upcoming events from one calendar (read-only).",
+  "steps": [
+    {
+      "title": "Open Google Calendar Settings",
+      "text": "Open Google Calendar Settings in your browser and click the calendar you want Pilot to read under \"Settings for my calendars\" on the left.",
+      "link": "https://calendar.google.com/calendar/u/0/r/settings",
+      "link_label": "Open Calendar Settings"
+    },
+    {
+      "title": "Copy the Secret address in iCal format",
+      "text": "Scroll down to \"Integrate calendar\", find \"Secret address in iCal format\" (a link ending in .ics), and copy it. Never share this link publicly."
+    },
+    {
+      "title": "Paste and test",
+      "text": "Give the calendar a short name (like Personal or School), paste the secret iCal link below, and press Test connection."
+    }
+  ],
+  "fields": [
+    {
+      "key": "calendar_name",
+      "label": "Calendar name",
+      "secret": false,
+      "default": "My Calendar"
+    },
+    {
+      "key": "ical_url",
+      "label": "Secret iCal link (.ics)",
+      "secret": true
+    }
+  ],
+  "test_button": "Test connection",
+  "connected_text": "Ask Pilot what is on your calendar whenever you like.",
+  "privacy": "Your secret iCal link is treated like a password and kept only in data/settings.json on this computer. Access is strictly read-only and limited to the single calendar you chose; Pilot cannot add, edit, or delete events."
+}
