@@ -152,16 +152,30 @@ Done when: in the window, the agent can make files in its workspace, run safe co
 - **Status line:** Chat shows what the agent is doing ("Running a command...", "Reading a page...").
 - **Efficiency:** tool names go in the prompt (one line each); full definitions are sent only when asked for, and `load_tool` can load several at once. Check: a fresh "hello" must stay under 3,000 tokens with all tools on.
 
+## Custom Domain, Cloudflare Tunnel & GitHub Deployment (2026-11-21)
+
+- **GitHub Repository:** `https://github.com/ikjotsingh27/Agent-is` (`main` branch; all 110 tracked files committed and pushed cleanly; zero secrets in git).
+- **GitHub Pages Landing Site:** `docs/index.html` + `docs/CNAME` (`ikjotai.ca`), published from `main` / `/docs`.
+- **Cloudflare Domain (`ikjotai.ca`) & Named Tunnel (`pilot`):**
+  - Cloudflare Zone ID: `3f9d0b6d0505dd4991ee473a72fd0f44` (`eve.ns.cloudflare.com`, `razvan.ns.cloudflare.com`).
+  - Cloudflare Named Tunnel `pilot` (`9aac9363-ebc2-4ba2-8d57-57800c254e0b`): ingress routes `app.ikjotai.ca -> http://127.0.0.1:8765` (with `http_status:404` catch-all).
+  - DNS records configured on `ikjotai.ca`:
+    - `ikjotai.ca` (`A`) -> `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153` (GitHub Pages)
+    - `www.ikjotai.ca` (`CNAME`) -> `ikjotsingh27.github.io`
+    - `app.ikjotai.ca` (`CNAME`, proxied) -> `9aac9363-ebc2-4ba2-8d57-57800c254e0b.cfargotunnel.com`
+  - Local `data/settings.json` (gitignored) holds `web_access.custom_url = "https://app.ikjotai.ca"`, `web_access.auto_tunnel = true`, and `connector_secrets.cloudflare.tunnel_token` (redacted everywhere).
+- **UI Design Contract:** `docs/UI_DESIGN_SPEC.md` documents every theme token, screen, component, `GET /api/state` field, and `POST` endpoint so the owner and Claude can customize or replace the frontend cleanly.
+
 ## Open issues
 
-- *(Resolved 2026-11-21, Session 6)* Workspace Python isolation: added optional `Create workspace Python` / `Remove workspace Python` inside `data/agent/venv` in Settings -> Agent workspace, so future `pip install`s stay inside the 5 GB cap when enabled.
+- *(Resolved 2026-11-21, Session 6)* Workspace Python isolation: added optional `Create workspace Python` / `Remove workspace Python` inside `data/agent/venv` in Settings -> Agent workspace (already created on disk by the owner).
 - *(Resolved 2026-11-21, Session 6)* Bing search fallback: added automatic DuckDuckGo HTML fallback when Bing returns 0 results.
 - *(Resolved 2026-11-21, Session 3b follow-up)* Cut-off replies at 1,024 tokens and PDF generation: `limits.max_output_tokens_with_tools` is now 4,096; cut-off replies and broken tool-call JSON retry once in smaller parts and fall back to a plain-language message (no `settings.json` mention); built-in `make_pdf` tool renders Markdown/text or an existing workspace file to PDF via hidden Edge `--print-to-pdf` (nothing to install). See `docs/ANTIGRAVITY_CHANGES.md`.
+- *(Note 2026-11-21)* `ikjotai.ca` was registered at `2026-11-22T01:43:00Z`; CIRA `.ca` root DNS (`*.ca-servers.ca`) and Cloudflare Universal SSL (`Let's Encrypt`) take ~30–60 minutes after a brand-new `.ca` purchase to finish global propagation. Local access (`http://127.0.0.1:8765`) and the Cloudflare Tunnel (`pilot`) are already live.
 
 ## Next steps
 
-1. **Owner hands-on testing:** Launch `python -m src window` and test Saved Sessions, live step-by-step thinking, Password-Protected Web Access, Activity & Usage Dashboard, Pause All, and optional `Create workspace Python`.
+1. **Custom UI work or hands-on testing with Claude:** Read `docs/ANTIGRAVITY_CHANGES.md` and `docs/UI_DESIGN_SPEC.md` for the full file inventory and JSON API contract.
 2. **Real connector tests:** Connect real accounts via guided setup in Connectors (Telegram bot on phone, Discord DM bot, Gmail App Password, Google Calendar secret iCal link) and run `Check health`.
 3. **Always-on reboot test:** Enable `Start at login` in Settings -> Always-on & Schedules and verify background recovery (`pythonw -m src daemon`) after a Windows sign-out / reboot.
 4. **First-run non-technical user test (Session 6 done-criterion):** Have someone unfamiliar with Pilot complete first-run setup alone in under 10 minutes.
-5. **Optional future work:** Privacy & trust section in `docs/BLUEPRINT.md`, voice note transcription, or customer/hosted phase when ready.
